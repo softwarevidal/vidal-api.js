@@ -2,26 +2,23 @@
 
 var PayloadFactory = (function(window) {
 	var Payload = function(type, contents) {
-		var _contents = _parse(contents), 
-			_type = type,
-			_encoding = 'UTF-8',
-			_parse = function(type, payload) {
-				var result;
-				if (type !== 'application/x-www-form-urlencoded') {
-					return payload;
+		var _parse = function(type, payload) {
+			var result;
+			if (type !== 'application/x-www-form-urlencoded') {
+				return payload;
+			}
+			for (var property in payload) {
+				if (payload.hasOwnProperty(property)) {
+					result += property + "=" + payload[property] + "&";
 				}
-				for (var property in payload) {
-					if (payload.hasOwnProperty(property)) {
-						result += property + "=" + payload[property] + "&";
-					}
-				}
-				return encodeURI(result.substring(0, result.length - 1));
-			};
+			}
+			return encodeURI(result.substring(0, result.length - 1));
+		},
+		_contents = _parse(type, contents), 
+		_type = type,
+		_encoding = 'UTF-8';
 
 		return {
-			size: function() {
-				return Math.max(0, _contents.split(/%..|./).length);
-			},
 			type: function() {
 				return _type;
 			},
@@ -43,56 +40,75 @@ var PayloadFactory = (function(window) {
 			if (typeof type === 'undefined') {
 				type = 'application/x-www-form-urlencoded';
 			}
-			return Payload(contents, type);
+			return Payload(type, contents);
 		}
 	}
 })(window);
 
-var VidalApi = (function(window) {
+var VidalApiFactory = (function(window) {
 
-	function _get(uri, callback) {
-		var request = new XMLHttpRequest();
+	var VidalApi = function(app_id, app_key) {
+		var _app_id = app_id,
+			_app_key = app_key;
 
-		request.onreadystatechange = function() {
-			if (request.readyState == 4 && request.status == 200) {
-				callback.apply(
-					this,
-					[new DOMParser().parseFromString(request.responseText, "text/xml")]
-				);
+		function _authenticated(app_id, app_key, uri) {
+			var questionMark = uri.indexOf('?'),
+				anchorMark = uri.indexOf('#');
+			if (questionMark >= 0 && (anchorMark === -1 || questionMark < anchorMark)) {
+				return uri + "&app_id=" + app_id + "&app_key=" + app_key;
 			}
-		}
-		request.open("GET", uri);
-		request.setRequestHeader("Accept", "application/atom+xml;charset=UTF-8");
-		request.send();
-	}
+			return uri + "?app_id=" + app_id + "&app_key=" + app_key;
+		}	
 
-	function _post(uri, callback, payload) {
-		var request = new XMLHttpRequest();
+		function _get(uri, callback) {
+			var request = new XMLHttpRequest();
 
-		request.onreadystatechange = function() {
-			if (request.readyState == 4 && request.status == 200) {
-				callback.apply(
-					this,
-					[new DOMParser().parseFromString(request.responseText, "text/xml")]
-				);
+			request.onreadystatechange = function() {
+				if (request.readyState == 4 && request.status == 200) {
+					callback.apply(
+						this,
+						[new DOMParser().parseFromString(request.responseText, "text/xml")]
+					);
+				}
 			}
+			request.open("GET", _authenticated(_app_id, _app_key, uri));
+			request.setRequestHeader("Accept", "application/atom+xml;charset=UTF-8");
+			request.send();
 		}
-		request.open("POST", uri);
-		request.setRequestHeader("Accept", "application/atom+xml;charset=UTF-8");
-		request.setRequestHeader('Content-Type', payload.type());
-		request.setRequestHeader("Content-Length", payload.size());
-		request.setRequestHeader("Content-Encoding", payload.encoding());
-		request.send(payload.payload());
-	}
+
+		function _post(uri, callback, payload) {
+			var request = new XMLHttpRequest();
+
+			request.onreadystatechange = function() {
+				if (request.readyState == 4 && request.status == 200) {
+					callback.apply(
+						this,
+						[new DOMParser().parseFromString(request.responseText, "text/xml")]
+					);
+				}
+			}
+			request.open("POST", _authenticated(_app_id, _app_key, uri));
+			request.setRequestHeader("Accept", "application/atom+xml;charset=UTF-8");
+			request.setRequestHeader('Content-Type', payload.type());
+			request.setRequestHeader("Content-Encoding", payload.encoding());
+			request.send(payload.payload());
+		}
+
+		return {
+			/**
+			 * Asynchronous GET requests, fetching atom+XML responses
+
+			 * @param uri: target URI
+			 * @param callback: callback to apply on the resulting XMLDocument
+			 */
+			get: _get,
+			post: _post
+		}
+	};
 
 	return {
-		/**
-		 * Asynchronous GET requests, fetching atom+XML responses
-
-		 * @param uri: target URI
-		 * @param callback: callback to apply on the resulting XMLDocument
-		 */
-		get: _get,
-		post: _post
-	}
+		create: function(app_id, app_key) {
+			return VidalApi(app_id, app_key);
+		}
+	};
 })(window);
