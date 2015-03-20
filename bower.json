@@ -1,0 +1,24 @@
+{
+  "name": "vidal-api.js",
+  "main": "vidal-api.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/softwarevidal/vidal-api.js",
+  "authors": [
+    "Vidal API Team <software@vidal.fr>"
+  ],
+  "description": "Vidal REST API SDK",
+  "keywords": [
+    "VIDAL",
+    "REST",
+    "API",
+    "SDK"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
