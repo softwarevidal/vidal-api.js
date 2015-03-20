@@ -15,32 +15,38 @@ Please note they are run against our BETA environment, please contact `editeurs 
 ### GET requests
 
  1. include `https://softwarevidal.github.io/vidal-api.js/vidal-api.js` (latest version)
+
  2. 
 ```javascript
-	var callback = function(xmlDoc) {
-		// awesome callback here
-	};
+var callback = function(xmlDoc) {
+	// awesome callback here
+};
 
-	VidalApiFactory.create('MY_APP_ID', 'MY_APP_KEY').get("http://apirest-beta.vidal.fr/rest/api/molecules?startwith=a", callback);
+VidalApiFactory
+	.create('MY_APP_ID', 'MY_APP_KEY')
+	.get("http://apirest-beta.vidal.fr/rest/api/molecules?startwith=a", callback);
 ```
 
 ### POST requests
 
  1. include `vidal-api.js`
+
  2.
 ```javascript
-	var callback = function(xmlDoc) {
-		// awesome callback here
-	},
-	contents = "\
+var callback = function(xmlDoc) {
+	// awesome callback here
+},
+    contents = "\
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?> \
 <prescription> \
 	<!-- etc etc --> \
 </prescription>";
-		// default payload type is: 'application/x-www-form-urlencoded'
-		payload = PayloadFactory.create(contents, "text/xml");
+    // default payload type is: 'application/x-www-form-urlencoded'
+    payload = PayloadFactory.create(contents, "text/xml");
 
-	VidalApiFactory.create('MY_APP_ID', 'MY_APP_KEY').post("http://apirest-beta.vidal.fr/rest/api/alerts", callback, payload);
+VidalApiFactory
+	.create('MY_APP_ID', 'MY_APP_KEY')
+	.post("http://apirest-beta.vidal.fr/rest/api/alerts", callback, payload);
 ```
 
 ## Troubleshooting
