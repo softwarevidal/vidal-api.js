@@ -8,6 +8,7 @@ To kickstart your project into calling the [Vidal API](https://vidal.3scale.net/
 
  1. Make sure your [3scale](https://vidal.3scale.net/) access is properly configured. If so, you should know your application ID (e.g. `"MY_APP_ID"`) and access key (e.g. `"MY_APP_KEY"`).
  1. Then, all you need to do is include the following Javascript file (latest version): `https://softwarevidal.github.io/vidal-api.js/vidal-api.js`
+ 1. Alternatively, you can run `bower install vidal-api.js`
 
 Finally, you can try the following examples and tailor them to your needs.
 Please note they are run against our BETA environment, please contact `editeurs AT vidal DOT net` for further information.
